@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="MemWallet — Deterministic cryptocurrency wallet generator for Bitcoin, Ethereum, Litecoin and Monero. AbdallahP2P addresses and private keys from a passphrase." />
+  <meta name="theme-color" content="#0a0e1a" />
+  <meta name="referrer" content="no-referrer" />
+  <title>MemWallet — Deterministic Wallet Generator for Bitcoin, Ethereum, Litecoin & Monero</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0e1a'/%3E%3Ctext x='50' y='68' font-size='60' text-anchor='middle' fill='%2300d4aa' font-family='sans-serif'%3E%E2%97%88%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="header" role="banner">
+    <div class="brand-mark">
+      <span class="brand-icon" aria-hidden="true">◈</span>
+      <h1>MemWallet</h1>
+    </div>
+    <p class="tagline">Like WrapWallet — but for altcoins</p>
+    <p class="offline-note">No external assets · Save this page to use fully offline</p>
+  </header>
+
+  <main class="content" role="main">
+
+    <section class="card" aria-label="Wallet generator">
+      <form class="form" autocomplete="off" onsubmit="return false;">
+
+        <fieldset class="form-group currency-selector">
+          <legend class="form-legend">Cryptocurrency</legend>
+          <div class="coin-grid">
+            <label class="coin-option">
+              <input name="coin" type="radio" value="bitcoin" checked onclick="resetState()" />
+              <span class="coin-label">Bitcoin</span>
+            </label>
+            <label class="coin-option">
+              <input name="coin" type="radio" value="ethereum" onclick="resetState()" />
+              <span class="coin-label">Ethereum</span>
+            </label>
+            <label class="coin-option">
+              <input name="coin" type="radio" value="litecoin" onclick="resetState()" />
+              <span class="coin-label">Litecoin</span>
+            </label>
+            <label class="coin-option">
+              <input name="coin" type="radio" value="monero" onclick="resetState()" />
+              <span class="coin-label">Monero</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="form-group">
+          <label class="form-label" for="passphrase">Passphrase</label>
+          <div class="form-field">
+            <input type="password" id="passphrase" name="passphrase"
+                   oninput="updateButton()"
+                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">
+            Salt <span class="optional">(optional)</span>
+            <a href="#" class="info-link" onclick="toggle('info'); return false;" aria-label="Salt information">[?]</a>
+          </div>
+          <div class="form-field">
+            <input type="text" id="salt" name="salt" oninput="resetState()"
+                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+          </div>
+        </div>
+
+        <div class="info-panel" id="info" style="display: none">
+          <p><span class="brand">MemWallet</span> can use a salt to make your wallet stronger. Use, for example, your email or phone number. If you're unsure, please do it.</p>
+          <a href="#" class="info-close" onclick="toggle('info'); return false;">[Close]</a>
+        </div>
+
+        <div id="progress" class="progress-container" style="display: none">
+          <p class="progress-label">Running scrypt…</p>
+          <div class="progress">
+            <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <button id="btn" class="btn btn-primary" type="button" disabled onclick="generate()">Generate</button>
+
+        <section class="results" aria-live="polite">
+          <h2 id="wallet-title" class="wallet-title" style="display: none"></h2>
+
+          <div class="form-group" id="cnt-public" style="display: none">
+            <label class="form-label" id="label-public" for="result-public"></label>
+            <div class="form-field">
+              <input type="text" id="result-public" class="result-field" readonly onclick="this.select()" />
+            </div>
+          </div>
+          <div class="form-group" id="cnt-private" style="display: none">
+            <label class="form-label" id="label-private" for="result-private"></label>
+            <div class="form-field">
+              <input type="text" id="result-private" class="result-field" readonly onclick="this.select()" />
+            </div>
+          </div>
+          <div class="form-group" id="cnt-public-view" style="display: none">
+            <label class="form-label" id="label-public-view" for="result-public-view"></label>
+            <div class="form-field">
+              <input type="text" id="result-public-view" class="result-field" readonly onclick="this.select()" />
+            </div>
+          </div>
+          <div class="form-group" id="cnt-private-view" style="display: none">
+            <label class="form-label" id="label-private-view" for="result-private-view"></label>
+            <div class="form-field">
+              <input type="text" id="result-private-view" class="result-field" readonly onclick="this.select()" />
+            </div>
+          </div>
+          <div class="form-group" id="cnt-public-spend" style="display: none">
+            <label class="form-label" id="label-public-spend" for="result-public-spend"></label>
+            <div class="form-field">
+              <input type="text" id="result-public-spend" class="result-field" readonly onclick="this.select()" />
+            </div>
+          </div>
+          <div class="form-group" id="cnt-private-spend" style="display: none">
+            <label class="form-label" id="label-private-spend" for="result-private-spend"></label>
+            <div class="form-field">
+              <input type="text" id="result-private-spend" class="result-field" readonly onclick="this.select()" />
+            </div>
+          </div>
+        </section>
+      </form>
+    </section>
+
+    <p id="online-alert" class="alert alert-warning">
+      <strong>⚠ You are online.</strong> For maximum security, save this page and generate the address on a computer disconnected from the internet.
+    </p>
+
+    <p id="js-alert" class="alert alert-danger">
+      JavaScript is disabled. <span class="brand">MemWallet</span> requires JavaScript to function.
+    </p>
+
+    <script src="js/01-ie-setup.js"></script>
+
+    <section class="explanation">
+      <p><span class="brand">MemWallet</span> is a deterministic cryptocurrency address generator, like <a href="https://keybase.io/warp/" target="_blank" rel="noopener noreferrer">WrapWallet</a>, but it works for Ethereum, Litecoin, Monero and Bitcoin. You never have to save or store your private key anywhere. Just pick a really good passphrase — many random words, for example — and never use it for anything else.</p>
+
+      <p>Given the same passphrase and salt, <span class="brand">MemWallet</span> will always generate the same address and private key, so you only need to remember your password to access your funds.</p>
+
+      <p>For more information on why this is safer than a regular brainwallet, see <a href="https://keybase.io/warp/" target="_blank" rel="noopener noreferrer">WrapWallet</a>'s help. <span class="brand">MemWallet</span> is a re-implementation of WarpWallet for other currencies. WarpWallet and <span class="brand">MemWallet</span> use the same algorithm, so they generate the same Bitcoin address for a given passphrase and salt.</p>
+    </section>
+
+    <section class="algorithm" aria-label="Algorithm details">
+      <h3>The Algorithm</h3>
+      <table>
+        <tbody>
+          <tr>
+            <td>b</td>
+            <td>=</td>
+            <td>1 for Bitcoin, 2 for Litecoin, 3 for Ethereum, 4 for Monero</td>
+          </tr>
+          <tr>
+            <td>seed<sub>1</sub></td>
+            <td>=</td>
+            <td>scrypt(key=(passphrase||b), salt=(salt||b), N=2<sup>18</sup>, r=8, p=1, dkLen=32)</td>
+          </tr>
+          <tr>
+            <td>seed<sub>2</sub></td>
+            <td>=</td>
+            <td>pbkdf2(key=(passphrase||(b+1)), salt=(salt||(b+1)), c=2<sup>16</sup>, dkLen=32, prf=SHA256)</td>
+          </tr>
+          <tr>
+            <td>wallet</td>
+            <td>=</td>
+            <td>generate_wallet(seed=(seed<sub>1</sub> ⊕ seed<sub>2</sub>))</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <script src="js/02-setimmediate.js"></script>
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <p><span class="brand">MemWallet</span> was made with ♥ by <a href="https://github.com/dvdbng" target="_blank" rel="noopener noreferrer">AbdallahP2P</a></p>
+    <p>Source code on <a href="https://github.com/AbdallahP2P/memwallet" target="_blank" rel="noopener noreferrer">GitHub</a> — including a Go implementation of the same algorithm.</p>
+  </footer>
+
+  <!-- JavaScript is intentionally left un-minified for offline auditing -->
+
+</body>
+</html>
